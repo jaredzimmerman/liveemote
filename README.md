@@ -130,13 +130,12 @@ The browser demo includes a **Google Meet WebRTC test mode** panel for checking 
 
 If the running LiveTalking process does not yet expose meeting-join support, the local demo falls back to opening a Chromium-family browser with WebRTC camera/microphone permissions pre-approved. Google may still require sign-in, lobby confirmation, or host admission before the avatar appears in the meeting.
 
-## Launch virtual camera mode
+## Virtual camera mode
 
-```bash
-make demo-virtualcam CHARACTER=./character_input
-```
-
-The LiveTalking adapter exposes a `start_virtualcam()` hook. Real virtual camera output requires LiveTalking and platform virtual camera dependencies to be installed and configured.
+The LiveTalking adapter exposes a `start_virtualcam()` hook, but there is no CLI
+flag wired to it yet, so there is no make target for this mode. Real virtual
+camera output also requires LiveTalking and platform virtual camera dependencies
+to be installed and configured.
 
 ## Voice backends
 
@@ -252,7 +251,6 @@ The browser UI discovers sibling character folders with `canonical/` assets and 
 make setup
 make demo CHARACTER=./character_input
 make demo-fake-hermes CHARACTER=./character_input
-make demo-virtualcam CHARACTER=./character_input
 make test
 ```
 

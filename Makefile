@@ -2,7 +2,24 @@ PYTHON ?= python
 CHARACTER ?= ./character_input
 VOICE_BACKEND ?= luxtts
 RENDERER ?= livetalking
-TRANSPORT ?= webrtc
+AGENT_MODE ?= fake
+HOST ?= 127.0.0.1
+PORT ?= 8080
+
+# Runtime dependencies only, without the vendor clones and model downloads that
+# `setup` performs. Enough to import the package and serve the demo.
+install:
+	$(PYTHON) -m pip install -e .
+
+# Import check: verifies the package and the FastAPI app factory both load.
+build:
+	$(PYTHON) -c "import hermes_avatar; from apps.demo_server.main import create_app; print('ok')"
+
+# Serve the demo on an externally reachable interface. Startup blocks for up to
+# ~30s while the renderer probes LiveTalking; it then logs "renderer backend
+# offline" and serves in passthrough mode, which is the expected headless path.
+preview:
+	$(PYTHON) -m apps.demo_server.main --host 0.0.0.0 --port $(PORT) --character $(CHARACTER) --renderer $(RENDERER) --voice-backend none --agent-mode offline
 
 setup:
 	$(PYTHON) -m pip install -e ".[test]"
@@ -15,13 +32,10 @@ setup:
 	$(PYTHON) scripts/setup_deeplivecam_models.py
 
 demo:
-	$(PYTHON) -m apps.demo_server.main --character $(CHARACTER) --renderer $(RENDERER) --voice-backend $(VOICE_BACKEND) --transport $(TRANSPORT)
+	$(PYTHON) -m apps.demo_server.main --character $(CHARACTER) --renderer $(RENDERER) --voice-backend $(VOICE_BACKEND) --agent-mode $(AGENT_MODE)
 
 demo-fake-hermes:
-	$(PYTHON) -m apps.demo_server.main --character $(CHARACTER) --renderer $(RENDERER) --voice-backend $(VOICE_BACKEND) --transport webrtc --hermes-mode fake
-
-demo-virtualcam:
-	$(PYTHON) -m apps.demo_server.main --character $(CHARACTER) --renderer $(RENDERER) --voice-backend $(VOICE_BACKEND) --transport virtualcam
+	$(PYTHON) -m apps.demo_server.main --character $(CHARACTER) --renderer $(RENDERER) --voice-backend $(VOICE_BACKEND) --agent-mode fake
 
 deeplivecam-models:
 	mkdir -p vendor
